@@ -2,9 +2,7 @@ name: Build Ibn Ezz POS Executable
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -24,14 +22,17 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
+          # إذا كان لديك ملف مكتبات requirements.txt قم بإلغاء التهميش عن السطر التالي:
+          # pip install -r requirements.txt
 
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller --noconfirm --onedir --windowed --name "IbnEzz_POS" main.py
+          # استبدل src/main.py بمسار ملفك الفعلي (مثلاً: app/main.py أو src/app.py)
+          pyinstaller --noconfirm --onedir --windowed --name "IbnEzz_POS" src/main.py
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: IbnEzz_POS_Executable
-          path: dist/IbnEzz_POS/
+          name: IbnEzz_POS_Windows
+          path: dist/IbnEzz_POS
           
