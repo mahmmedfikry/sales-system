@@ -1,64 +1,37 @@
-name: Build Ibn Ezz Sales System
+name: Build Ibn Ezz POS Executable
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches:
+      - main
+      - master
   workflow_dispatch:
 
 jobs:
-  build-windows:
-    name: Build Windows Executable
+  build-exe:
     runs-on: windows-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python Environment
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
-      - name: Install Core Tools
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller pillow
+          pip install pyinstaller
 
-      - name: Install Project Requirements (If exists)
+      - name: Build EXE with PyInstaller
         run: |
-          if (Test-Path requirements.txt) { pip install -r requirements.txt }
+          pyinstaller --noconfirm --onedir --windowed --name "IbnEzz_POS" main.py
 
-      - name: Generate High Quality Sales System Icon
-        run: |
-          python -c "
-          from PIL import Image, ImageDraw
-
-          # إنشاء خلفية كحلي فاخرة ملائمة لأنظمة المبيعات
-          img = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
-          draw = ImageDraw.Draw(img)
-          draw.rounded_rectangle([10, 10, 246, 246], radius=45, fill=(15, 23, 42))
-
-          # رسم أعمدة بيانية تعبر عن نظام المبيعات والنمو (أخضر، أزرق، برتقالي)
-          draw.rounded_rectangle([45, 135, 85, 205], radius=8, fill=(16, 185, 129))
-          draw.rounded_rectangle([105, 100, 145, 205], radius=8, fill=(59, 130, 246))
-          draw.rounded_rectangle([165, 60, 205, 205], radius=8, fill=(245, 158, 11))
-
-          # رسم سهم النمو والنجاح الأبيض
-          draw.line([(45, 120), (105, 85), (165, 45)], fill=(255, 255, 255), width=9)
-          draw.polygon([(195, 25), (155, 35), (180, 65)], fill=(255, 255, 255))
-
-          # حفظ الأيقونة بأعلى جودة لمختلف الأحجام في الويندوز
-          img.save('app_icon.ico', format='ICO', sizes=[(256, 256), (128, 128), (64, 64), (48, 48), (32, 32), (16, 16)])
-          print('Icon Generated Successfully!')
-          "
-
-      - name: Build Executable File
-        run: |
-          pyinstaller --onefile --noconsole --name "Ibn_Ezz_System" --icon="app_icon.ico" --clean app.py
-
-      - name: Upload Windows EXE Artifact
+      - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Ibn_Ezz_System_Windows_EXE
-          path: dist/Ibn_Ezz_System.exe
+          name: IbnEzz_POS_Executable
+          path: dist/IbnEzz_POS/
           
