@@ -1,39 +1,33 @@
-name: Build Ibn Ezz POS Executable
+name: Build Single Exe
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
-  build-exe:
+  build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4.2.2
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+    - name: Set up Python
+      uses: actions/setup-python@v5.4.0
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller pillow
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
 
-      - name: Download and Generate POS Icon
-        run: |
-          python -c "import urllib.request; from PIL import Image; urllib.request.urlretrieve('https://raw.githubusercontent.com/googlefonts/noto-emoji/main/png/512/emoji_u1f6d2.png', 'icon.png'); img = Image.open('icon.png'); img.save('icon.ico', format='ICO')"
+    - name: Build Executable with PyInstaller
+      run: |
+        pyinstaller --noconfirm --onefile --windowed --name "IbnEzz_POS" app.py
 
-      - name: Build EXE with PyInstaller
-        run: |
-          pyinstaller --noconfirm --onedir --windowed --icon="icon.ico" --name "IbnEzz_POS" app.py
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: IbnEzz_POS_Windows
-          path: dist/IbnEzz_POS
-          
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4.6.1
+      with:
+        name: IbnEzz_POS_Executable
+        path: dist/IbnEzz_POS.exe
+        
